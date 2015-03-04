@@ -1,0 +1,16 @@
+ifneq ($(KERNELRELEASE),)
+# kbuild part of makefile
+#obj-m := hello.o
+#obj-m := worker.o
+#obj-m := worker1.o
+#obj-m := stuckworker.o
+obj-m := fixedworker.o
+
+else
+# Normal Makefile
+KERNELDIR := /lib/modules/2.6.21.1/build
+
+all::
+	$(MAKE) -C $(KERNELDIR) M=`pwd` modules
+
+endif

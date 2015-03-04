@@ -1,0 +1,624 @@
+#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass article
+\use_default_options true
+\language english
+\inputencoding auto
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Operating Systems for Mobile Devices
+\end_layout
+
+\begin_layout Date
+23/11/2012
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Paragraph
+Small devices place many constraints upon the operating systems designed
+ for them.
+ This report aims to identify these constraints and explain what effects
+ they have on the design of operating systems, with reference to the Android
+ operating system in particular.
+\end_layout
+
+\begin_layout Section
+Body
+\end_layout
+
+\begin_layout Subsection
+Physical Space
+\end_layout
+
+\begin_layout Paragraph
+Mobile devices, by their very nature, must be small.
+ This places limitations on hardware; there is much less space for hardware
+ in a mobile device than in a larger PC or Laptop.
+ Necessarily, then, mobile devices will have more modest hardware specifications
+ when compared to larger devices.
+ This will in turn influence the design of any mobile OS, as it will need
+ to run well and reliably with these more modest hardware capabilities.
+\end_layout
+
+\begin_layout Subsection
+Usage and Functionality
+\end_layout
+
+\begin_layout Paragraph
+Mobile devices are used very differently from other devices, having fundamentall
+y different requirements.
+ A mobile phone, for example, must be constantly connected to some mobile
+ network, and able to transmit/receive calls/texts at all times.
+ This is the basic core functionality expected of a phone and as such needs
+ to be considered in the design of any mobile OS, whereas an OS for a PC
+ need not consider this as the functionality would not be required.
+ Additionally, mobile devices utilize very different I/O devices; any modern
+ mobile OS must be designed to handle a touchscreen/keypad, a camera, and
+ have Bluetooth, GPS and WiFi capabilities, but probably does not need the
+ capabilities to interface with peripheral devices (such as a printer),
+ unless it be via Bluetooth or through a larger machine.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+This is part of the reason why Android arrived at the following anatomy:
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Graphics
+	filename pasted1.png
+	width 12cm
+
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Figure 1: Android Anatomy
+\begin_inset Newline newline
+\end_inset
+
+Source: http://developer.android.com/images/system-architecture.jpg
+\end_layout
+
+\begin_layout Paragraph
+The Android anatomy is based on stripped down version of the Linux Kernel.
+ It lacks much of the functionality of a Linux distribution; it does not
+ have many standard Linux utilities, a native windowing system or Glibc[1],
+ because this functionality is not necessary for a mobile device, and by
+ omitting this functionality memory is saved.
+ It makes use of the Dalvik Virtual Machine, chosen over JVM for its ability
+ to run multiple virtual machines efficiently and its minimal memory footprint[2
+] (also possibly to get around licensing issues[3]).
+ This will be discussed futher on in the report.
+\end_layout
+
+\begin_layout Subsection
+Batteries
+\end_layout
+
+\begin_layout Paragraph
+Small devices such as Smartphones and Tablets typically run on battery power,
+ and due to the constraints on physical space these batteries don't tend
+ to be large, especially in mobile phones.
+ However the device must still have a reasonably long battery life, (as
+ long as reasonably possible), and as such the OS should aim to use power
+ as economically as possible.
+ To this end, the OS should keep the use of all hardware to a minimum.
+ This influences not only the design of the OS, but also the design of the
+ device at a hardware level.
+ Mobile devices tend to use chips made by ARM (with ARM holding roughly
+ 95% of the market share in the smartphone market during 2010 [4]), whereas
+ traditionally PCs have mainly used Intel x86 processors [5][6].
+ ARM chips currently use less power than ones made by Intel, making them
+ more suited for use in battery operated devices[5], however PCs are generally
+ designed without worrying quite so much about power expenditure, (since
+ they generally have access to mains power), and so can afford to utilize
+ x86 chips.
+ As such, operating systems for mobile devices should aim to support the
+ ARM architecture as much as possible.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+In actuality, due to its being based on the Linux Kernel, Android has support
+ for both the x86 and ARM architectures, as well as MIPS[7].
+ However most android devices are ARM based, making this rather redundant.
+ Other mobile operating systems, such as iOS, Symbian and Windows Phone
+ etc.
+ are exclusively ARM[7].
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+With power conservation being such a big factor, mobile operating systems
+ have to consider providing utilities to help preserve power as much as
+ possible at both the OS and application level.
+ None-mobile operating systems do this as well to a certain extent - to
+ enhance battery life for Laptop Computers, but not to the same degree.
+\end_layout
+
+\begin_layout Subsection
+Hardware
+\end_layout
+
+\begin_layout Paragraph
+The processors in small devices run at much lower speeds that modern day
+ PCs and Laptops, and there tends to be significantly less Primary Memory.
+ In 2011 smartphone processor speeds ranged from 1-1.6 GHz, and RAM ranged
+ from 512mB - 2GB[9].
+ This is limiting for the OS, as the slower processor speeds and lower primary
+ storage capacity affect the responsiveness of the device to the user, as
+ well as the complexity of operations that can be expected to be reasonably
+ performed.
+ Additionally, mobile devices often have small amounts of secondary storage.
+ This places limits on the amount of memory which can be used as virtual
+ memory, which in turn impacts the device's ability to effectively multi-task.
+ Consequently, the OS must be written in a way that ensures most economic
+ processor and memory usage.
+ Android addresses this in several ways.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Firstly, the Dalvik Virtual Machine utilizes a JIT (just in time) compiler
+ (added in the Android 2.2 release)[8], to speed up the execution of applications
+ (all applications are written in Java).
+ According to Android developer Dan Bornstein, 'The JIT is a software component
+ which takes application code, analyzes it, and actively translates it into
+ a form that runs faster, doing so while the application continues to run.'
+ He adds that code can be observed running effectively 'about 4x to 10x
+ faster than a more traditional interpreter implementation'.
+ This is a very significant saving of CPU time, and whilst there is a tradeoff
+ with memory usage Dan writes that 'The code for the JIT itself is well
+ under 100k, and each process that the JIT runs in will typically only use
+ another 100k or so of RAM'.
+ Considering the saving the JIT can offer in terms of processing speed,
+ it certainly seems worth the small tradeoff in memory.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Secondly, Android uses a process called Zygote when launching applications[1].
+ Zygote is a core process which launches at startup.
+ It is initialized and core libraries are linked in.
+ Whenever a new process is launched Zygote is forked, with the new process
+ taking one of the forks.
+ This results in 2 effects: each new process runs in its own virtual machine,
+ protecting application files and memory without using additional system
+ resources; and core libraries aren't copied and are stored in one place,
+ saving memory.
+ They will be copied should the application attempt to modify them, however.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Android also has its own method for terminating processes[1][10][11].
+ It is called lowmemkiller and starts when all caches have been emptied[11].
+ It terminates processes if and when the memory available to the OS drops
+ below a certain threshold[11].
+ The order in which processes are killed is determined by their priority[10],
+ which is determined by a least recently used algorithm[1].
+ From some of the comments of developer Arve Hjønnevåg in [11], it looks
+ like this may have been a bit of a hack (which also makes it really difficult
+ to understand).
+ Nevertheless it solves memory issues - without it there have been issues
+ of devices being 'stuck for many minutes before the system managed to allocate
+ enough memory for the oom killer to kick in' [11].
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+One big drawback for Android, and Mobile operating systems in general, is
+ that they can't really implement virtual memory due to lack of secondary
+ storage.
+ In the case of Android some apps do store their state when killed, but
+ not all apps do and some states do not contain enough data.
+ An example of this from [12], the browser stores URLs of open pages when
+ killed, but not the data on them, meaning that the device has to reacquire
+ the data from the internet, which is slow.
+ This is probably rendered necessary by lack of secondary storage.
+ Since it is built on the Linux Kernel, the capability of implement a swap
+ partition is there and has been done [12], but it appears to be subject
+ to debate as to whether this actually improves performance or not.
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+Another way in which Android saves memory again goes back to the Dalvik
+ Virtual Machine.
+ A tool dx is used to convert some Java .class files into a .dex file, which
+ typically is a few percent smaller than .jar file compiled from the same
+ .class files [13].
+ There is also the possibility of a little further optimisation of the .dex
+ when it is installed onto a mobile device.
+ There is ongoing debate as to the merits Dalvik's register based approach
+ versus the stack machines approach of Sun's JVM.
+ Some sources suggest that a register based approach is faster [13], whereas
+ others appear to suggest the opposite [14].
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Paragraph
+To summarise, I have identified several constraints on OS design for small
+ devices: The small amount of physical space; The modest hardware, specifically
+ the processor, RAM and secondary storage; and the different requirements
+ with regards to functionality.
+ Android has tried to tackle these constraints in various ways; with everything
+ coming together to try and minimise CPU and Memory usage.
+ It's use of the Dalvik virtual machine along with Zygote gives a level
+ of abstraction between the Linux kernel and Java applications, ensures
+ protection of applications' files and memory, reduces memory usage by storing
+ libraries in one place, all without compromising CPU speed, and possibly
+ improving it.
+ It also attempts to optimise memory usage by killing background processes,
+ with some level of success, and makes an attempt to store killed process
+ states to help relaunch them faster.
+ All these optimisations, along with Android's adoption of the ARM architecture,
+ work together to help ensure better power conservation and hence longer
+ battery life, improving the utility of the device.
+\end_layout
+
+\begin_layout Section
+Bibliography
+\end_layout
+
+\begin_layout Standard
+[1] Colt.
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Android OS - Processes and the Zygote!
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://coltf.blogspot.co.uk/p/android-os-processes-and-zygote.html
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[2] Williams, Alun; (2011/10/25).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+What is...
+ the Dalvik virtual machine?
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://www.electronicsweekly.com/blogs/eyes-on-android-updates/2011/10/what-is-the
+-dalvik-virtual-machine.html
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[3] Mazzocchi, Stefano; (2007/11/12).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Dalvik: how Google routed around Sun’s IP-based licensing restrictions on
+ Java ME
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://www.betaversion.org/~stefano/linotype/news/110/
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[4] Morgan, Timothy Prickett; (2011/02/01).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+ARM Holdings
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://www.theregister.co.uk/2011/02/01/arm_holdings_q4_2010_numbers/
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[5] Bajarin, Tim; (2012/07/16).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+ARM vs.
+ Intel: How the Processor Wars Will Benefit Consumers
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://techland.time.com/2012/07/16/arm-vs-intel-how-the-processor-wars-will-benef
+it-consumers-most/
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[6] Courtland, Rachel; (May 2012).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+The Battle Between ARM and Intel Gets Real
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://spectrum.ieee.org/semiconductors/processors/the-battle-between-arm-and-inte
+l-gets-real
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[7] 
+\begin_inset Quotes eld
+\end_inset
+
+Comparison of mobile Operating Systems
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://en.wikipedia.org/wiki/Comparison_of_mobile_operating_systems
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[8] Bornstein, Dan; (2012/05/25).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Dalvik JIT
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://android-developers.blogspot.co.uk/2010/05/dalvik-jit.html
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[9] 
+\begin_inset Quotes eld
+\end_inset
+
+Comparrison of Smartphones
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://en.wikipedia.org/wiki/Comparison_of_smartphones
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[10] Unknown Author (2010/07/05).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Memory Management in Android
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://mobworld.wordpress.com/2010/07/05/memory-management-in-android/
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[11] Hjønnevåg, Arve et al.
+ First Post (2009/01/13).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+lowmemory android driver not needed?
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://www.gossamer-threads.com/lists/linux/kernel/1020983
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[12] Blattman, Jeffrey; Bob; (2009/12/18).
+ 
+\begin_inset Quotes eld
+\end_inset
+
+Why Android Swap Doesnt Make Sense
+\begin_inset Quotes erd
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+http://zerocredibility.wordpress.com/2009/08/24/why-android-swap-doesnt-make-sense
+/
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[13] Shi, Yunhe; Gregg, David; Beatty, Andrew; Ertl, M.
+ Anton (2005-06-11).
+ "Virtual Machine Showdown: Stack Versus Registers".
+\begin_inset Newline newline
+\end_inset
+
+http://www.usenix.org/events/vee05/full_papers/p153-yunhe.pdf
+\begin_inset Newline newline
+\end_inset
+
+
+\begin_inset Newline newline
+\end_inset
+
+[14] Vandette, Bob (2010-11-22).
+ "Java SE Embedded Performance Versus Android 2.2".
+ Oracle Corporation.
+\begin_inset Newline newline
+\end_inset
+
+http://blogs.oracle.com/javaseembedded/entry/how_does_android_22s_performance_stac
+k_up_against_java_se_embedded
+\end_layout
+
+\end_body
+\end_document

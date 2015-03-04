@@ -1,0 +1,31 @@
+
+
+
+What Happens:
+
+Stuckworker clocks on and works correctly, however it does 
+not terminate properly after an rmmod command is issued. It
+gets stuck after printing 'Your worker is clocking off' and
+hangs.
+
+Cause of the problem:
+
+The cleanup module runs first. It sets the flag signalling the worker module to clock
+off, the times out for 12 seconds.This timeout moves in down the wait queue, so the 
+worker module runs next; printing its clocking off message, waking the wait queue and
+then exiting. However since the timeout is still active and uninterruptible this wake
+call is ignored (as is intended, to give parralell processes a chance to finish). 
+However when this timeout completes, the cleanup module is put to sleep again,(this
+line is neccessary in case there were no processes running to delay the module), a sleep
+from which it will never wake since no further wake_up is issued.
+
+Solution:
+
+A solution to this is to replace the sleep_on command with
+a wait_event, which will sleep until some boolean expression
+evaluates true. By setting a flag alongside the wakeup call,
+and making the boolean condition that this flag is set, the
+wait_event will always wake whether or not there is a timeout.
+If there is no timeout the wait_event is woken by the worker's
+wake_up, if there is a timeout then the flag ensures that it
+wakes.
